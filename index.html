@@ -1,0 +1,135 @@
+ <!--
+     Designed and Prepared By AzeTurk810 with power of GPT
+ -->
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Yeni ilə birlikdə gülümsə</title>
+  <style>
+    :root{
+      --bg1:#0b132b;
+      --bg2:#1c2541;
+      --warm:#ffd166;
+      --soft:#fefefe;
+    }
+
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    body{
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:var(--soft);
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+    }
+
+    .card{
+      width:min(900px,94vw);
+      padding:40px 32px;
+      border-radius:22px;
+      background:rgba(255,255,255,0.05);
+      box-shadow:0 20px 50px rgba(0,0,0,0.5);
+      position:relative;
+      text-align:center;
+      backdrop-filter:blur(6px);
+    }
+
+    h1{
+      font-size:clamp(34px,6vw,52px);
+      margin:0 0 16px 0;
+      font-weight:700;
+    }
+
+    p{
+      font-size:18px;
+      line-height:1.6;
+      margin:10px 0;
+      opacity:0.95;
+    }
+
+    .highlight{color:var(--warm);font-weight:600}
+
+    .footer{
+      margin-top:32px;
+      font-size:14px;
+      opacity:0.75;
+    }
+
+    .btn{
+      margin-top:26px;
+      padding:12px 18px;
+      border-radius:14px;
+      border:none;
+      background:var(--warm);
+      color:#1a1a1a;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    /* soft snow */
+    .snow{position:absolute;inset:0;pointer-events:none}
+    .flake{
+      position:absolute;top:-10px;
+      color:white;opacity:0.5;
+      animation:fall linear infinite;
+    }
+    @keyframes fall{
+      to{transform:translateY(110vh)}
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="snow" id="snow"></div>
+
+    <h1>🎄 Yeni ilə birlikdə gülümsə</h1>
+
+    <p>
+      Bu il də keçdi. <br>
+      Çətin günləri oldu, gözəl anları da oldu.
+    </p>
+
+    <p>
+      Əgər bunu oxuyursansa, bil ki <span class="highlight">kimsə səni düşünüb</span> 🙂
+    </p>
+
+    <p>
+      Yeni ildə sənə bir az daha <span class="highlight">rahatlıq</span>,<br>
+      bir az daha <span class="highlight">ümid</span>,<br>
+      və özünə qarşı bir az daha <span class="highlight">mərhəmət</span> arzulayıram.
+    </p>
+
+    <p>
+      Böyük möcüzələr yox…<br>
+      Sadəcə səni sevindirən xırda anlar ✨
+    </p>
+
+    <button class="btn" onclick="warmWish()">🤍 Təşəkkür edirəm</button>
+
+    <div class="footer">
+      Bu kart xüsusi olaraq sənin üçün hazırlandı.<br>
+      Yeni ildə görüşərik 🤍
+    </div>
+  </div>
+
+  <script>
+    // snow generator
+    const snow = document.getElementById('snow');
+    for(let i=0;i<40;i++){
+      const f=document.createElement('div');
+      f.className='flake';
+      f.innerText='❄';
+      f.style.left=Math.random()*100+'%';
+      f.style.fontSize=(10+Math.random()*14)+'px';
+      f.style.animationDuration=(8+Math.random()*12)+'s';
+      f.style.animationDelay=(-Math.random()*20)+'s';
+      snow.appendChild(f);
+    }
+
+    function warmWish(){
+      alert('Yeni ilin sakit, işıqlı və ürəyincə olsun 🤍');
+    }
+  </script>
+</body>
+</html>
+
