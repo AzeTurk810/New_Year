@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Yeni iliniz mübarək — Super UI</title>
+  <style>
+    :root{
+      --bg1:#0f172a; /* deep navy */
+      --bg2:#0b1220;
+      --accent:#ffb86b;
+      --accent2:#7efcff;
+      --glass: rgba(255,255,255,0.06);
+    }
+
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+    body{
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(126,252,255,0.06), transparent),
+                  linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#e6eef8;overflow:hidden;display:flex;align-items:center;justify-content:center;
+    }
+
+    /* Center card */
+    .card{
+      width:min(1100px,96vw);max-width:1100px;height:min(680px,86vh);border-radius:20px;padding:28px;box-sizing:border-box;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 10px 30px rgba(4,6,15,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.03);backdrop-filter: blur(6px);position:relative;overflow:hidden;
+      display:grid;grid-template-columns:1fr 420px;gap:24px;align-items:stretch;
+    }
+
+    .left{padding:18px 24px;display:flex;flex-direction:column;gap:18px;justify-content:center}
+    .right{padding:18px 22px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center}
+
+    h1{font-size:clamp(34px,6vw,56px);line-height:0.95;margin:0;font-weight:700;text-shadow:0 6px 30px rgba(0,0,0,0.6)}
+    p.lead{margin:0;color:rgba(230,238,248,0.82);font-size:18px}
+
+    .cta-row{display:flex;gap:12px;align-items:center;margin-top:8px}
+    .btn{background:linear-gradient(90deg,var(--accent),#ff8fa3);border:none;padding:12px 16px;border-radius:12px;font-weight:600;cursor:pointer;color:#06202a}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--accent2)}
+
+    /* small controls */
+    .controls{display:flex;flex-direction:row;gap:10px;align-items:center}
+    .switch{display:inline-flex;align-items:center;gap:8px}
+
+    /* right side preview */
+    .preview{
+      width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border-radius:14px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.02);
+    }
+
+    .greeting-area{width:95%;height:62%;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative}
+    .greeting{font-size:clamp(22px,4vw,36px);font-weight:800;margin:0;text-align:center}
+    .sub{font-size:clamp(14px,2.2vw,18px);opacity:0.9;margin-top:6px}
+
+    /* fireworks canvas stretches behind */
+    canvas#fireworks{position:absolute;inset:0;pointer-events:none;z-index:0}
+
+    /* confetti pieces container */
+    .confetti{position:absolute;inset:0;pointer-events:none}
+
+    /* small footer */
+    .meta{font-size:12px;color:rgba(230,238,248,0.6);}
+
+    /* responsive */
+    @media (max-width:900px){
+      .card{grid-template-columns:1fr;grid-auto-rows:1fr 320px}
+      .right{order:-1}
+    }
+
+    /* Accessibility focus */
+    .btn:focus{outline:3px solid rgba(126,252,255,0.12);outline-offset:3px}
+
+    /* snowflake (subtle) */
+    .snowflake{position:absolute;top:-10%;left:50%;transform:translateX(-50%);opacity:0.06;font-size:420px;pointer-events:none}
+  </style>
+</head>
+<body>
+  <div class="card" role="region" aria-label="Yeni il kartı">
+    <canvas id="fireworks"></canvas>
+    <div class="left">
+      <div>
+        <h1 id="title">Yeni iliniz mübarək!</h1>
+        <p class="lead">Sevdiklərinizlə dolu, uğur və xoşbəxtliklə dolu bir il arzulayıram. Bu sayt sadəcə gözəl görünmək üçün deyil — həm də xatırlamağa və paylaşmağa hazır bir kartdır.</p>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn" id="toggleConfetti">Konfetini aç</button>
+        <button class="btn ghost" id="downloadBtn">Kartı yüklə</button>
+        <div class="controls" style="margin-left:auto">
+          <label class="switch"><input id="toggleSound" type="checkbox" aria-label="Səs toggle"><span style="font-size:12px;color:rgba(230,238,248,0.7)">Səs</span></label>
+        </div>
+      </div>
+
+      <div class="meta">Bu faylı düzəltmək üçün HTML içindəki #greeting mətnini dəyişə bilərsiniz. İstəsəniz mən React/Tailwind versiyasını da hazırlayım.</div>
+    </div>
+
+    <div class="right">
+      <div class="preview" id="preview">
+        <div class="greeting-area" id="cardCanvas">
+          <div class="greeting" id="greeting">Yeni iliniz mübarək — Xoşbəxt 2026!</div>
+          <div class="sub" id="sub">Sizə bol şans, sağlamlıq və böyük layihələr arzulayıram.</div>
+        </div>
+        <div class="snowflake">❆</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
+        <button class="btn ghost" id="shareBtn">Paylaş (copy link)</button>
+        <div style="font-size:13px;color:rgba(230,238,248,0.6)">Hazırlayan: <strong>You</strong></div>
+      </div>
+    </div>
+
+    <div style="position:absolute;right:18px;bottom:12px;font-size:11px;color:rgba(230,238,248,0.45)">Animasiya + Konfet — JS ilə</div>
+
+    <div class="confetti" id="confetti"></div>
+  </div>
+
+  <script>
+    // ---------- small helpers ----------
+    const rand = (a,b)=> a + Math.random()*(b-a);
+
+    // Fireworks canvas
+    const fw = document.getElementById('fireworks');
+    const ctx = fw.getContext('2d');
+    function resize(){fw.width = window.innerWidth; fw.height = window.innerHeight}
+    resize(); window.addEventListener('resize', resize);
+
+    // particles
+    class Particle{constructor(x,y,dx,dy,color,size,life){Object.assign(this,{x,y,dx,dy,color,size,life,age:0})}
+      step(){this.x+=this.dx;this.y+=this.dy;this.dy+=0.02;this.age++;}
+      draw(){ctx.globalAlpha = Math.max(0,1 - this.age/this.life);ctx.fillStyle=this.color;ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();}
+    }
+
+    let particles = [];
+    function launch(x,y,color){
+      const count = Math.floor(rand(18,30));
+      for(let i=0;i<count;i++){
+        const speed = rand(1,5);
+        const angle = rand(0, Math.PI*2);
+        particles.push(new Particle(x,y, Math.cos(angle)*speed, Math.sin(angle)*speed, color, rand(1,3), rand(40,80)));
+      }
+    }
+
+    function tick(){
+      ctx.clearRect(0,0,fw.width,fw.height);
+      for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.step();p.draw(); if(p.age>p.life)particles.splice(i,1)}
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // random periodic fireworks
+    setInterval(()=>{
+      const x = rand(100, window.innerWidth-100);
+      const y = rand(100, window.innerHeight/2);
+      const colors = ['#ffb86b','#7efcff','#ffd5ec','#b8ffb0'];
+      launch(x,y, colors[Math.floor(Math.random()*colors.length)]);
+    }, 1100);
+
+    // Confetti particles in DOM
+    const confettiRoot = document.getElementById('confetti');
+    let confettiOn = false;
+    const confettiPool = [];
+    function makeConfetti(){
+      const el = document.createElement('div');
+      el.style.position='absolute';
+      el.style.width='10px';el.style.height='16px';el.style.left=rand(0,100)+'%';
+      el.style.top='-4%';el.style.opacity='0.95';el.style.willChange='transform,top';
+      el.style.borderRadius='2px';
+      el.style.transform='rotate('+rand(0,360)+'deg)';
+      el.style.background = ['#ff6b6b','#ffd166','#7efcff','#9b8cff'][Math.floor(rand(0,4))];
+      el.style.boxShadow='0 2px 8px rgba(0,0,0,0.18)';
+      el.dataset.speed = rand(1.2,3.2);
+      el.dataset.spin = rand(200,800);
+      confettiRoot.appendChild(el);
+      confettiPool.push(el);
+      setTimeout(()=>{ if(el.parentNode) el.remove(); const idx = confettiPool.indexOf(el); if(idx>-1) confettiPool.splice(idx,1); }, 8000);
+    }
+    let confettiInterval;
+    function startConfetti(){ if(confettiInterval) return; confettiInterval = setInterval(makeConfetti, 80); confettiOn=true; document.getElementById('toggleConfetti').innerText='Konfetini bağla' }
+    function stopConfetti(){ clearInterval(confettiInterval); confettiInterval=null; confettiOn=false; document.getElementById('toggleConfetti').innerText='Konfetini aç' }
+
+    document.getElementById('toggleConfetti').addEventListener('click', ()=>{ confettiOn?stopConfetti():startConfetti(); });
+
+    // animate confetti positions
+    function confettiLoop(){
+      for(let el of confettiPool){
+        const s = Number(el.dataset.speed);
+        el.style.top = (parseFloat(el.style.top) + s) + '%';
+        el.style.transform = 'rotate(' + (parseFloat(el.style.transform.replace(/rotate\(|deg\)/g,'')) + s*2) + 'deg)';
+      }
+      requestAnimationFrame(confettiLoop);
+    }
+    confettiLoop();
+
+    // Sound (optional) - small chime
+    const chimeUrl = 'data:audio/ogg;base64,T2dnUwACAAAAAAAAAABVDx4AAAAAAAC0cQ...'; // placeholder small beep (left truncated on purpose)
+    let audio;
+    document.getElementById('toggleSound').addEventListener('change',(e)=>{
+      if(e.target.checked){
+        try{ audio = new Audio(); audio.src = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_f7e6a4b0f1.ogg?filename=happy-new-year-107079.mp3'; audio.loop=true; audio.volume=0.25; audio.play().catch(()=>{}); }catch(err){}
+      }else{ if(audio){ audio.pause(); audio = null; }}
+    });
+
+    // share button: copy current greeting text as simple link-text (no server)
+    document.getElementById('shareBtn').addEventListener('click', ()=>{
+      const text = document.getElementById('greeting').innerText + '\n' + document.getElementById('sub').innerText;
+      navigator.clipboard.writeText(text).then(()=>{ alert('Təbrik mətni clipboard-a kopyalandı — istədiyiniz yerə yapışdırın!') }).catch(()=>{ alert('Clipboard-a kopyalama mümkün olmadı — brauzer məhdudiyyəti') })
+    });
+
+    // Download: we will render a simple canvas image (not a full HTML render) for reliable download
+    document.getElementById('downloadBtn').addEventListener('click', ()=>{
+      const w = 1600, h = 900;
+      const c = document.createElement('canvas'); c.width=w; c.height=h; const g=c.getContext('2d');
+      // background gradient
+      const grad = g.createLinearGradient(0,0,0,h); grad.addColorStop(0,'#071029'); grad.addColorStop(1,'#071722'); g.fillStyle=grad; g.fillRect(0,0,w,h);
+      // decorative stars
+      for(let i=0;i<120;i++){g.fillStyle = ['#ffb86b','#7efcff','#ffd5ec','#b8ffb0'][Math.floor(Math.random()*4)]; g.globalAlpha = Math.random()*0.9; const r=rand(0.6,3.8); g.beginPath(); g.arc(rand(0,w), rand(0,h*0.6), r,0,Math.PI*2); g.fill();}
+      g.globalAlpha=1;
+      // main text
+      const title = document.getElementById('greeting').innerText;
+      const sub = document.getElementById('sub').innerText;
+      g.fillStyle='#fff'; g.textAlign='center';
+      g.font='bold 84px system-ui,Arial'; wrapText(g,title,w/2,h*0.46,110,84);
+      g.font='500 40px system-ui,Arial'; wrapText(g,sub,w/2,h*0.62,120,40);
+      // small footer
+      g.font='300 20px system-ui,Arial'; g.fillStyle='rgba(255,255,255,0.6)'; g.fillText('Hazırlayan: You', w/2, h-48);
+
+      // download
+      const a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = 'Yeni-Il-Karti.png'; a.click();
+    });
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+      const words = text.split(' '); let line=''; let curY=y; for(let n=0;n<words.length;n++){
+        const testLine = line + words[n] + ' '; const metrics = ctx.measureText(testLine); const testWidth = metrics.width;
+        if(testWidth > maxWidth && n>0){ ctx.fillText(line, x, curY); line = words[n] + ' '; curY += lineHeight; } else { line = testLine; }
+      } ctx.fillText(line, x, curY);
+    }
+
+    // small flourish: pulse greeting
+    const gEl = document.getElementById('greeting');
+    setInterval(()=>{ gEl.animate([{transform:'scale(1)'},{transform:'scale(1.035)'}],{duration:900,iterations:1,easing:'ease-out'}); }, 1600);
+
+    // set current year automatically
+    const y = new Date().getFullYear();
+    if(!/\d{4}/.test(document.getElementById('greeting').innerText)){
+      document.getElementById('greeting').innerText = `Yeni iliniz mübarək — Xoşbəxt ${y}!`;
+    }
+
+    // small accessibility: keyboard shortcut C to toggle confetti
+    window.addEventListener('keydown',(e)=>{ if(e.key.toLowerCase()==='c'){ confettiOn?stopConfetti():startConfetti() } });
+
+    // initial small burst
+    setTimeout(()=>{ launch(window.innerWidth/2,window.innerHeight/3,'#ffb86b'); }, 600);
+  </script>
+</body>
+</html>
+
